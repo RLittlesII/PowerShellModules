@@ -3,7 +3,7 @@
 		This is designed to add the upstream remote; fetch the upstream; merge the upstream to master; and push the origin to master.
 
 	.DESCRIPTION
-		Syncronizes a forked repository
+		Synchronizes a forked repository
 		
 	.PARAMETER Repository
 		URL of the original repository to synchronize with the fork
@@ -20,8 +20,14 @@ function Pull-Fork
 		[Parameter(Mandatory=$true)] [string] $Repository
 	)
 	
-	git remote add upstream $Repository
+	#Verify there are no upstream remotes created
+	if((git remote -v | ForEach-Object { $_.contains('upstream') }).contains($true) -eq $false)
+	{
+		Write-Warning "No remote exists at the repository location $Repository"
+		git remote add upstream $Repository
+	}
 	
+	Write-Host "Fetching Upstream Remote (The repository this fork originated from) . . ." -ForegroundColor Green
 	git fetch upstream
 	
 	git merge upstream/master
